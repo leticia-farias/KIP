@@ -88,7 +88,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // IMPORTANTE: URL do seu backend Dart.
   // Use o IP da sua máquina para testes em dispositivos reais, ou 'localhost' para Web/Desktop.
-  final String _apiUrl = 'http://localhost:8080/packages/suggest';
+  final String _apiUrl = 'https://backend-assistente-a5hj.onrender.com/';
 
   @override
   void initState() {
@@ -103,84 +103,80 @@ class _ChatScreenState extends State<ChatScreen> {
 
   /// Função principal para enviar a mensagem do usuário e obter sugestões da IA.
   void _sendMessage() async {
-    final text = _controller.text.trim();
-    if (text.isEmpty || _isLoading) return;
+  final text = _controller.text.trim();
+  if (text.isEmpty || _isLoading) return;
 
-    // Adiciona a mensagem do usuário
-    setState(() {
-      _messages.add(ChatMessage(text: text, isUser: true));
-      _controller.clear();
-      _isLoading = true;
+  // Adiciona a mensagem do usuário no chat
+  setState(() {
+    _messages.add(ChatMessage(text: text, isUser: true));
+    _controller.clear();
+    _isLoading = true;
+  });
+
+  try {
+    // 1. Prepara o payload JSON usando a mensagem do usuário
+    final payload = jsonEncode({
+      'needs': text,      // texto digitado pelo usuário
+      'budget': 999.0,    // valor padrão, pode ajustar conforme backend
     });
 
-    try {
-      // 1. Prepara o Payload no formato JSON esperado pelo backend Dart
-      final payload = jsonEncode({
-        // O backend usa a string completa da necessidade para gerar a sugestão
-        'needs': text,
-        // O orçamento é um campo obrigatório no backend, mas podemos usar um valor padrão aqui.
-        'budget':
-            999.0, // Usamos um valor alto, pois a IA processa a necessidade textual.
-      });
+    // 2. Faz a requisição HTTP POST para o backend
+    final response = await http.post(
+      Uri.parse(_apiUrl), // use a URL pública do backend (Render/Cloud Run)
+      headers: {'Content-Type': 'application/json'},
+      body: payload,       // envia o payload correto
+    );
 
-      // 2. Faz a Requisição HTTP POST
-      final response = await http.post(
-        Uri.parse('http://192.168.15.8:8080/packages/suggest'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'needs': 'internet', 'budget': 100}),
-      );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
+      if (responseData['success'] == true &&
+          responseData.containsKey('suggestions')) {
+        // 3. Desserializa as sugestões JSON
+        final List<dynamic> jsonSuggestions = responseData['suggestions'];
+        final List<Package> suggestedPackages = jsonSuggestions
+            .map((json) => Package.fromJson(json as Map<String, dynamic>))
+            .toList();
 
-        if (responseData['success'] == true &&
-            responseData.containsKey('suggestions')) {
-          // 3. Desserializa as Sugestões JSON da IA
-          final List<dynamic> jsonSuggestions = responseData['suggestions'];
-          final List<Package> suggestedPackages = jsonSuggestions
-              .map((json) => Package.fromJson(json as Map<String, dynamic>))
-              .toList();
-
-          // 4. Adiciona a resposta da IA na tela
-          setState(() {
-            _messages.add(ChatMessage(
-              text:
-                  'Com base na sua solicitação, encontrei as seguintes sugestões:',
-              isUser: false,
-              suggestions: suggestedPackages,
-            ));
-          });
-        } else {
-          // Resposta da IA com sucesso=false
-          setState(() {
-            _messages.add(ChatMessage(
-              text: responseData['message'] ??
-                  'A IA não conseguiu gerar sugestões.',
-              isUser: false,
-            ));
-          });
-        }
+        // 4. Adiciona a resposta da IA na tela
+        setState(() {
+          _messages.add(ChatMessage(
+            text:
+                'Com base na sua solicitação, encontrei as seguintes sugestões:',
+            isUser: false,
+            suggestions: suggestedPackages,
+          ));
+        });
       } else {
-        // Erro de Servidor (500)
-        throw Exception('Erro no servidor Dart: ${response.statusCode}');
+        // Resposta da IA com success=false
+        setState(() {
+          _messages.add(ChatMessage(
+            text: responseData['message'] ??
+                'A IA não conseguiu gerar sugestões.',
+            isUser: false,
+          ));
+        });
       }
-    } catch (e) {
-      // Erro de Conexão
-      print('Erro de comunicação HTTP: $e');
-      setState(() {
-        _messages.add(ChatMessage(
-          text:
-              'Erro de conexão: Verifique se o backend Dart está rodando em $_apiUrl. $e',
-          isUser: false,
-        ));
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+    } else {
+      // Erro de servidor
+      throw Exception('Erro no servidor Dart: ${response.statusCode}');
     }
+  } catch (e) {
+    // Erro de conexão
+    print('Erro de comunicação HTTP: $e');
+    setState(() {
+      _messages.add(ChatMessage(
+        text:
+            'Erro de conexão: Verifique se o backend Dart está rodando em $_apiUrl. $e',
+        isUser: false,
+      ));
+    });
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
   }
-
+}
   // --- Widgets ---
 
   Widget _buildMessage(ChatMessage message) {
