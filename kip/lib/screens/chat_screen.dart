@@ -3,10 +3,11 @@ import '../models/chat_message.dart';
 import '../services/assistant_service.dart';
 import '../widgets/message_bubble.dart';
 
-/// Tela principal do chat do assistente.
-/// Contém a lista de mensagens e área de input de texto.
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  // 1. Adicionar um parâmetro para a mensagem inicial
+  final String? initialMessage;
+
+  const ChatScreen({super.key, this.initialMessage});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -17,21 +18,25 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   bool _isLoading = false;
 
-  /// Instancia o serviço que comunica com o backend
   final AssistantService _service =
       AssistantService(apiUrl: 'https://backend-assistente-a5hj.onrender.com/');
 
   @override
   void initState() {
     super.initState();
-    // Mensagem inicial de boas-vindas
     _messages.add(ChatMessage(
         text:
             'Olá! Sou seu assistente de planos. Diga-me o que você precisa (ex: "Quero dados móveis até 100 reais").',
         isUser: false));
+
+    // 2. Lógica para processar a mensagem inicial, se ela existir
+    if (widget.initialMessage != null && widget.initialMessage!.isNotEmpty) {
+      // Adiciona a mensagem ao controlador e chama a função de envio
+      _controller.text = widget.initialMessage!;
+      _sendMessage();
+    }
   }
 
-  /// Envia mensagem do usuário e busca sugestões da IA
   void _sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty || _isLoading) return;
@@ -48,7 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
         _messages.add(ChatMessage(
             text: suggestions.isEmpty
                 ? 'Não encontrei sugestões.'
-                : 'Sugestões encontradas:',
+                : 'Encontrei estas sugestões para você:',
             isUser: false,
             suggestions: suggestions));
       });
@@ -58,25 +63,33 @@ class _ChatScreenState extends State<ChatScreen> {
             text: 'Erro ao conectar com o servidor: $e', isUser: false));
       });
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // O resto do build continua igual...
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Assistente Inteligente (Gemini)'),
-        backgroundColor: Colors.blue.shade800,
+        title: const Text('Assistente Inteligente'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
+      backgroundColor: const Color(0xFFC50000), // Cor de fundo do app
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              reverse: true,
+              reverse: true, // Mantém as mensagens mais recentes visíveis
               itemCount: _messages.length,
-              itemBuilder: (context, index) =>
-                  MessageBubble(message: _messages[_messages.length - 1 - index]),
+              itemBuilder: (context, index) {
+                // Inverte a lista para exibir corretamente com reverse: true
+                final reversedIndex = _messages.length - 1 - index;
+                return MessageBubble(message: _messages[reversedIndex]);
+              },
             ),
           ),
           const Divider(height: 1),
@@ -86,8 +99,8 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  /// Área de input de texto e botão de envio
   Widget _buildInputArea() {
+    // ... O método _buildInputArea() continua o mesmo
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       color: Theme.of(context).cardColor,
