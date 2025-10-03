@@ -14,9 +14,8 @@ class BaseLayout extends StatelessWidget {
         final values = ResponsiveValues.of(constraints);
         final isDesktop = values.isDesktop;
 
-        // Definindo paddings de acordo com as novas regras
         final double horizontalPadding = isDesktop ? constraints.maxWidth * 0.25 : 32.0;
-        final double topPadding = isDesktop ? 84.0 : 72.0;
+        final double topPadding = 32.0;
         final double bottomPadding = 32.0;
 
         return Container(
@@ -28,12 +27,9 @@ class BaseLayout extends StatelessWidget {
                 AppColors.gradientStart,
                 AppColors.gradientEnd,
               ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
             ),
           ),
           child: Padding(
-            // Usando EdgeInsets.fromLTRB para paddings não simétricos
             padding: EdgeInsets.fromLTRB(
               horizontalPadding,
               topPadding,
@@ -46,6 +42,8 @@ class BaseLayout extends StatelessWidget {
                   'assets/images/Logo.png',
                   height: values.logoHeight,
                 ),
+                // Espaçamento adicionado aqui
+                const SizedBox(height: 16),
                 Expanded(
                   child: Center(
                     child: builder(context, values),

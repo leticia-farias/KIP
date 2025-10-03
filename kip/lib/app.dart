@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kip/screens/onboarding_screen.dart'; // A tela que vamos criar a seguir
+import 'package:kip/screens/chat_screen.dart';
+import 'package:kip/screens/onboarding_screen.dart'; 
+import 'package:kip/screens/card_test_screen.dart'; 
 
 class SmartAssistantApp extends StatelessWidget {
   const SmartAssistantApp({super.key});

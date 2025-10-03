@@ -54,7 +54,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       children: [
                         Text(
                           'Olá, sou seu assistente inteligente. Me conte o que você precisa e quanto pode pagar.',
-                          textAlign: TextAlign.center,
                           style: AppTextStyles.h2.copyWith(color: AppColors.textLight),
                         ),
                         const SizedBox(height: 32),
