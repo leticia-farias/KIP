@@ -14,7 +14,7 @@ class BaseLayout extends StatelessWidget {
         final values = ResponsiveValues.of(constraints);
         final isDesktop = values.isDesktop;
 
-        final double horizontalPadding = isDesktop ? constraints.maxWidth * 0.25 : 32.0;
+        final double horizontalPadding = isDesktop ? constraints.maxWidth * 0.19 : 32.0;
         final double topPadding = 32.0;
         final double bottomPadding = 32.0;
 

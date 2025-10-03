@@ -8,15 +8,15 @@ class AppTextStyles {
 
   // h1: fontSize 24, bold, AppColors.primary (usando gradientEnd como primária)
   static final TextStyle h1 = GoogleFonts.poppins(
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: FontWeight.bold,
     color: AppColors.gradientEnd,
   );
 
   // h2: fontSize 18, semiBold, AppColors.textDark
   static final TextStyle h2 = GoogleFonts.poppins(
-    fontSize: 18,
-    fontWeight: FontWeight.w600, // semiBold
+    fontSize: 24,
+    fontWeight: FontWeight.w500, // semiBold
     color: AppColors.textDark,
   );
   
