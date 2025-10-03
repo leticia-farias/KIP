@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'screens/chat_screen.dart';
+import 'package:kip/screens/onboarding_screen.dart'; // A tela que vamos criar a seguir
 
-/// Configura o MaterialApp, definindo tema, título e tela inicial.
 class SmartAssistantApp extends StatelessWidget {
   const SmartAssistantApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Assistente Gemini de Planos',
+      debugShowCheckedModeBanner: false,
+      title: 'Assistente Inteligente',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
+        primarySwatch: Colors.red,
+        scaffoldBackgroundColor: const Color(0xFFC50000), // Fundo vermelho padrão
+        fontFamily: 'Roboto', // Exemplo de fonte, pode ser customizada
       ),
-      home: const ChatScreen(),
+      home: const OnboardingScreen(),
     );
   }
 }
