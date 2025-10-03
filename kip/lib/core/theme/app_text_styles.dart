@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
-  static const title = TextStyle(
+  // Use 'final' em vez de 'const' e chame a função GoogleFonts.poppins()
+  static final TextStyle h2 = GoogleFonts.poppins(
     fontSize: 20,
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.w500,
     color: AppColors.textLight,
   );
 
-  static const body = TextStyle(
+  static final TextStyle p = GoogleFonts.poppins(
     fontSize: 16,
     color: AppColors.textLight,
   );
