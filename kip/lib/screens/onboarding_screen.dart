@@ -1,22 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:kip/core/layout/base_layout.dart';
-import 'package:kip/core/theme/app_colors.dart';
-import 'package:kip/core/theme/app_text_styles.dart';
-import 'package:kip/screens/chat_screen.dart'; 
+import 'package:kip/models/chat_message.dart';
+import 'package:kip/services/assistant_service.dart';
 import 'package:kip/widgets/custom_input.dart';
+import 'package:kip/widgets/message_bubble.dart';
 
-class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+class ChatScreen extends StatefulWidget {
+  // 1. O parâmetro é definido aqui
+  final String? initialMessage;
+  final VoidCallback? onChatComplete;
+
+  // 2. O construtor é atualizado para aceitar o parâmetro
+  const ChatScreen({
+    super.key,
+    this.initialMessage,
+    this.onChatComplete,
+  });
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _ChatScreenState extends State<ChatScreen> {
+  final List<ChatMessage> _messages = [];
   final TextEditingController _controller = TextEditingController();
-  // 2. O estado de isLoading e o service não são mais necessários aqui
-  // bool _isLoading = false;
-  // final AssistantService _service = ...
+  bool _isLoading = false;
+
+  final AssistantService _service =
+      AssistantService(apiUrl: 'https://backend-assistente-a5hj.onrender.com/');
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 3. A lógica para usar a mensagem inicial é executada aqui
+    if (widget.initialMessage != null && widget.initialMessage!.isNotEmpty) {
+      _controller.text = widget.initialMessage!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _sendMessage();
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -24,18 +48,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  // 3. Simplificar a função de envio
-  Future<void> _handleSubmitted() async {
+  void _sendMessage() async {
     final text = _controller.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty || _isLoading) return;
 
-    if (mounted) {
-      // Apenas navega para a ChatScreen, passando a mensagem
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => ChatScreen(initialMessage: text),
-        ),
-      );
+    setState(() {
+      _messages.add(ChatMessage(text: text, isUser: true));
+      _controller.clear();
+      _isLoading = true;
+    });
+
+    try {
+      final suggestions = await _service.getSuggestions(text);
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+              text: suggestions.isEmpty
+                  ? 'Não encontrei sugestões para sua solicitação.'
+                  : 'Com base no que você pediu, encontrei as seguintes opções:',
+              isUser: false,
+              suggestions: suggestions));
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+              text: 'Desculpe, tive um problema para me conectar. Tente novamente mais tarde.',
+              isUser: false));
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -44,32 +90,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Scaffold(
       body: BaseLayout(
         builder: (context, values) {
-          return Builder(
-            builder: (BuildContext innerContext) {
-              return Column(
-                children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Olá, sou seu assistente inteligente. Me conte o que você precisa e quanto pode pagar.',
-                          style: AppTextStyles.h2.copyWith(color: AppColors.textLight),
-                        ),
-                        const SizedBox(height: 32),
-                        CustomInput(
-                          controller: _controller,
-                          // O isLoading agora é sempre falso aqui
-                          isLoading: false,
-                          onSend: _handleSubmitted,
-                        ),
-                        SizedBox(height: values.logoHeight + values.spacingAfterLogo),
-                      ],
-                    ),
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  itemCount: _messages.length,
+                  itemBuilder: (context, index) => MessageBubble(message: _messages[index]),
+                ),
+              ),
+              if (widget.onChatComplete != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
+                    onPressed: widget.onChatComplete,
+                    child: const Text("Continuar para o Cadastro"),
                   ),
-                ],
-              );
-            },
+                ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CustomInput(
+                  controller: _controller,
+                  isLoading: _isLoading,
+                  onSend: _sendMessage,
+                ),
+              ),
+            ],
           );
         },
       ),

@@ -92,7 +92,7 @@ class SuggestionCard extends StatelessWidget {
       children: [
         Text(
           title,
-          style: AppTextStyles.caption.copyWith(color: Colors.grey.shade600, fontSize: 14),
+          style: AppTextStyles.h4.copyWith(color: Colors.grey.shade600, fontSize: 14),
         ),
         const SizedBox(height: 8),
         Text(

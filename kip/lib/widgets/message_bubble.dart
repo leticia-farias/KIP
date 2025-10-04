@@ -28,7 +28,7 @@ class MessageBubble extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 5),
               child: Text(
                 'Assistente inteligente',
-                style: AppTextStyles.hintText.copyWith(color: AppColors.textDark),
+                style: AppTextStyles.h4.copyWith(color: AppColors.textLight),
               ),
             ),
           Container(
@@ -50,7 +50,7 @@ class MessageBubble extends StatelessWidget {
               children: [
                 Text(
                   message.text,
-                  style: TextStyle(color: textColor),
+                  style: AppTextStyles.h4.copyWith(color: AppColors.textDark),
                 ),
                 if (message.suggestions != null &&
                     message.suggestions!.isNotEmpty)

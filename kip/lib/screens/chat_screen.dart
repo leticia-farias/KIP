@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:kip/core/layout/base_layout.dart';
-import 'package:kip/widgets/custom_input.dart';
 import '../models/chat_message.dart';
 import '../services/assistant_service.dart';
 import '../widgets/message_bubble.dart';
 
+/// Tela principal do chat do assistente.
+/// Contém a lista de mensagens e área de input de texto.
 class ChatScreen extends StatefulWidget {
-  final String? initialMessage;
-
-  const ChatScreen({super.key, this.initialMessage});
+  const ChatScreen({super.key});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -19,31 +17,21 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   bool _isLoading = false;
 
+  /// Instancia o serviço que comunica com o backend
   final AssistantService _service =
       AssistantService(apiUrl: 'https://backend-assistente-a5hj.onrender.com/');
 
   @override
   void initState() {
     super.initState();
+    // Mensagem inicial de boas-vindas
     _messages.add(ChatMessage(
         text:
-            'Olá, sou seu assistente inteligente. Me conte o que você precisa e quanto pode pagar.',
+            'Olá! Sou seu assistente de planos. Diga-me o que você precisa (ex: "Quero dados móveis até 100 reais").',
         isUser: false));
-
-    if (widget.initialMessage != null && widget.initialMessage!.isNotEmpty) {
-      _controller.text = widget.initialMessage!;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _sendMessage();
-      });
-    }
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
+  /// Envia mensagem do usuário e busca sugestões da IA
   void _sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty || _isLoading) return;
@@ -56,54 +44,75 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       final suggestions = await _service.getSuggestions(text);
-      if (mounted) {
-        setState(() {
-          _messages.add(ChatMessage(
-              text: suggestions.isEmpty
-                  ? 'Não encontrei sugestões para sua solicitação.'
-                  : 'Com base no que você pediu, indico o seguinte:',
-              isUser: false,
-              suggestions: suggestions));
-        });
-      }
+      setState(() {
+        _messages.add(ChatMessage(
+            text: suggestions.isEmpty
+                ? 'Não encontrei sugestões.'
+                : 'Sugestões encontradas:',
+            isUser: false,
+            suggestions: suggestions));
+      });
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _messages.add(ChatMessage(
-              text: 'Desculpe, tive um problema para me conectar ao servidor. Tente novamente mais tarde.', isUser: false));
-        });
-      }
+      setState(() {
+        _messages.add(ChatMessage(
+            text: 'Erro ao conectar com o servidor: $e', isUser: false));
+      });
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BaseLayout(
-        builder: (context, values) {
-          return Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  // reverse: true,
-                  itemCount: _messages.length,
-                  itemBuilder: (context, index) =>
-                      MessageBubble(message: _messages[index]),
-                ),
-              ),
-              const SizedBox(height: 16), // Espaçamento antes do input
-              CustomInput(
-                controller: _controller,
-                isLoading: _isLoading,
-                onSend: _sendMessage,
-              ),
-            ],
-          );
-        },
+      appBar: AppBar(
+        title: const Text('Assistente Inteligente (Gemini)'),
+        backgroundColor: Colors.blue.shade800,
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              reverse: true,
+              itemCount: _messages.length,
+              itemBuilder: (context, index) =>
+                  MessageBubble(message: _messages[_messages.length - 1 - index]),
+            ),
+          ),
+          const Divider(height: 1),
+          _buildInputArea(),
+        ],
+      ),
+    );
+  }
+
+  /// Área de input de texto e botão de envio
+  Widget _buildInputArea() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      color: Theme.of(context).cardColor,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              decoration: const InputDecoration.collapsed(
+                  hintText: 'Digite sua necessidade'),
+              onSubmitted: (_) => _sendMessage(),
+              enabled: !_isLoading,
+            ),
+          ),
+          IconButton(
+            icon: _isLoading
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.send, color: Colors.blue),
+            onPressed: _isLoading ? null : _sendMessage,
+          ),
+        ],
       ),
     );
   }

@@ -24,7 +24,7 @@ class ConfirmButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.all(16),
       ),
       child: isLoading
           ? const SizedBox(

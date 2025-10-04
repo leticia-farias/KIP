@@ -44,7 +44,7 @@ class SuggestionCard extends StatelessWidget {
                     children: [
                       Text(
                         'Plano',
-                        style: AppTextStyles.caption.copyWith(
+                        style: AppTextStyles.h4.copyWith(
                             color: Colors.grey.shade600, fontSize: 14),
                       ),
                       const SizedBox(height: 8),
@@ -63,7 +63,7 @@ class SuggestionCard extends StatelessWidget {
                   children: [
                     Text(
                       'Preço',
-                      style: AppTextStyles.caption
+                      style: AppTextStyles.h4
                           .copyWith(color: Colors.grey.shade600, fontSize: 14),
                     ),
                     const SizedBox(height: 8),

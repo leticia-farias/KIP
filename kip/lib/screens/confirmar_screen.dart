@@ -4,7 +4,7 @@ import 'package:kip/core/theme/app_colors.dart';
 import 'package:kip/core/theme/app_text_styles.dart';
 import 'package:kip/models/package.dart';
 import 'package:kip/widgets/confirm_button.dart';
-import 'package:kip/screens/profile_screen.dart';
+import 'package:kip/screens/Score_screen.dart';
 
 class ConfirmarScreen extends StatelessWidget {
   final Package package;
@@ -22,7 +22,7 @@ class ConfirmarScreen extends StatelessWidget {
             title: 'Plano selecionado',
             child: Text(
               '${package.name} + ${package.features}',
-              style: AppTextStyles.h2.copyWith(fontSize: 22),
+              style: AppTextStyles.h2,
             ),
           );
 
@@ -33,13 +33,12 @@ class ConfirmarScreen extends StatelessWidget {
               children: [
                 Text(
                   'R\$ ${package.price.toStringAsFixed(2).replaceAll('.', ',')}/mês',
-                  style: AppTextStyles.h1
-                      .copyWith(color: AppColors.textDark, fontSize: 32),
+                  style: AppTextStyles.h1,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Cobrança mensal, cancele quando quiser',
-                  style: AppTextStyles.caption
+                  style: AppTextStyles.h4
                       .copyWith(color: Colors.grey.shade600),
                 ),
               ],
@@ -49,17 +48,14 @@ class ConfirmarScreen extends StatelessWidget {
           final paymentCard = _buildPaymentCard(context);
 
           if (isDesktop) {
-            // Layout para Desktop
             return Center(
-              // 1. Adicionado um limite de largura máxima
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 960),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 2. Trocado Flexible por Expanded
                     Expanded(
-                      flex: 2, // A coluna da esquerda ocupa 2/3 do espaço
+                      flex: 2,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -70,9 +66,8 @@ class ConfirmarScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 24),
-                    // 3. Trocado Flexible por Expanded
                     Expanded(
-                      flex: 1, // A coluna da direita ocupa 1/3 do espaço
+                      flex: 1,
                       child: paymentCard,
                     ),
                   ],
@@ -80,7 +75,6 @@ class ConfirmarScreen extends StatelessWidget {
               ),
             );
           } else {
-            // Layout para Mobile
             return SingleChildScrollView(
               child: Column(
                 children: [
@@ -100,7 +94,7 @@ class ConfirmarScreen extends StatelessWidget {
 
   Widget _buildInfoCard({required String title, required Widget child}) {
     return Container(
-      width: double.infinity, // Garante que o card preencha a coluna
+      width: double.infinity, 
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -111,7 +105,7 @@ class ConfirmarScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: AppTextStyles.caption.copyWith(color: Colors.grey.shade600),
+            style: AppTextStyles.h4.copyWith(color: Colors.grey.shade600),
           ),
           const SizedBox(height: 8),
           child,
@@ -132,7 +126,7 @@ class ConfirmarScreen extends StatelessWidget {
         children: [
           Text(
             'Forma de pagamento',
-            style: AppTextStyles.caption.copyWith(color: Colors.grey.shade600),
+            style: AppTextStyles.h4.copyWith(color: Colors.grey.shade600),
           ),
           const SizedBox(height: 8),
           Row(
@@ -148,14 +142,14 @@ class ConfirmarScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Pode alterar a forma',
-            style: AppTextStyles.caption.copyWith(color: Colors.grey.shade600),
+            style: AppTextStyles.h4.copyWith(color: Colors.grey.shade600),
           ),
           const SizedBox(height: 24),
           ConfirmButton(
             text: 'Confirmar assinatura',
             onPressed: () {
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const PerfilScreen()),
+                MaterialPageRoute(builder: (context) => const ScoreScreen()),
                 (Route<dynamic> route) => false,
               );
             },

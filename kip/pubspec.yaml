@@ -16,6 +16,7 @@ dependencies:
   dash_chat_2: ^0.0.21
   http: ^1.2.1
   speech_to_text: ^7.3.0
+  syncfusion_flutter_gauges: ^26.1.35 
 
 dev_dependencies:
   flutter_test:

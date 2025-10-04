@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:kip/core/layout/base_layout.dart';
 import 'package:kip/core/theme/app_text_styles.dart';
-import 'package:kip/models/package.dart';
-import 'package:kip/screens/confirmar_screen.dart';
+import 'package:kip/screens/Score_screen.dart';
 import 'package:kip/widgets/confirm_button.dart';
 
-class CadastroScreen extends StatelessWidget {
-  final Package package;
-
-  const CadastroScreen({super.key, required this.package});
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,27 +17,32 @@ class CadastroScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Cadastro',
-                style: AppTextStyles.h2.copyWith(color: Colors.white),
+                'Que bom te ver por aqui!',
+                style: AppTextStyles.h1.copyWith(color: Colors.white),
               ),
-              const SizedBox(height: 24),
-              
-              // --- Formulário ---
-              _buildTextField(label: 'Nome completo'),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              Text(
+                'Acesse sua conta para continuar.',
+                style: AppTextStyles.h4,
+              ),
+              const SizedBox(height: 32),
+
+              // --- Formulário de Login ---
               _buildTextField(label: 'E-mail', keyboardType: TextInputType.emailAddress),
               const SizedBox(height: 16),
-              _buildTextField(label: 'Telefone', keyboardType: TextInputType.phone),
+              _buildTextField(label: 'Senha', obscureText: true),
               // --- Fim do Formulário ---
 
-              const Spacer(), // Empurra o botão para a parte inferior
+              const Spacer(),
               
               ConfirmButton(
-                text: 'Continuar',
+                text: 'Entrar',
                 onPressed: () {
-                  Navigator.of(context).push(
+                  // Lógica de login aqui (no futuro, chamaria o backend)
+                  // Por enquanto, navega direto para a tela de perfil
+                  Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (_) => ConfirmarScreen(package: package),
+                      builder: (_) => const ScoreScreen(),
                     ),
                   );
                 },
@@ -52,10 +54,14 @@ class CadastroScreen extends StatelessWidget {
     );
   }
 
-  // Widget auxiliar para criar os campos de texto
-  Widget _buildTextField({required String label, TextInputType? keyboardType}) {
+  Widget _buildTextField({
+    required String label,
+    TextInputType? keyboardType,
+    bool obscureText = false,
+  }) {
     return TextFormField(
       keyboardType: keyboardType,
+      obscureText: obscureText,
       style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         hintText: label,

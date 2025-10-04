@@ -15,7 +15,7 @@ class SmartAssistantApp extends StatelessWidget {
         primarySwatch: Colors.red,
         scaffoldBackgroundColor: const Color(0xFFC50000), // Fundo vermelho padrão
       ),
-      home: const ChatScreen(),
+      home: const OnboardingScreen(),
     );
   }
 }
