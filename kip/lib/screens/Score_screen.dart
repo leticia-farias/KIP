@@ -1,4 +1,4 @@
-// lib/screens/Score_screen.dart
+// kip/lib/screens/Score_screen.dart
 import 'package:flutter/material.dart';
 import 'package:kip/core/layout/base_layout.dart';
 import 'package:kip/core/theme/app_colors.dart';
@@ -7,44 +7,45 @@ import 'package:kip/screens/chat_screen.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class ScoreScreen extends StatelessWidget {
+  final double? score;
+  final String userName;
   final bool isNewUser;
 
-  const ScoreScreen({super.key, this.isNewUser = false});
+  const ScoreScreen({
+    super.key,
+    this.score,
+    this.userName = "Usuário",
+    this.isNewUser = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final showNewUserCard = isNewUser || score == null;
+
     return Scaffold(
       body: BaseLayout(
         builder: (context, values) {
           final isDesktop = values.isDesktop;
-          final scoreCard = isNewUser
-              ? _buildNewUserScoreCard(context)
-              : _buildScoreCard(context);
+          final scoreCard = showNewUserCard
+              ? _buildNewUserScoreCard(context, userName)
+              : _buildScoreCard(context, score!, userName);
           final actionButtons = _buildActionButtons(context);
 
           if (isDesktop) {
-            // Layout para Desktop
             return Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1080),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      flex: 4,
-                      child: scoreCard,
-                    ),
+                    Expanded(flex: 4, child: scoreCard),
                     const SizedBox(width: 24),
-                    Expanded(
-                      flex: 5,
-                      child: actionButtons,
-                    ),
+                    Expanded(flex: 5, child: actionButtons),
                   ],
                 ),
               ),
             );
           } else {
-            // Layout para Mobile
             return SingleChildScrollView(
               child: Column(
                 children: [
@@ -59,7 +60,7 @@ class ScoreScreen extends StatelessWidget {
       ),
     );
   }
-
+  
   Widget _buildActionButtons(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -106,20 +107,19 @@ class ScoreScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNewUserScoreCard(BuildContext context) {
+  Widget _buildNewUserScoreCard(BuildContext context, String name) {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
       ),
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.7,
-      ),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Text('Bem-vindo(a), $name!', style: AppTextStyles.h2),
+            const SizedBox(height: 24),
             const Icon(Icons.hourglass_empty, size: 48, color: AppColors.textDark),
             const SizedBox(height: 16),
             Text(
@@ -139,7 +139,7 @@ class ScoreScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildScoreCard(BuildContext context) {
+  Widget _buildScoreCard(BuildContext context, double userScore, String name) {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
@@ -154,10 +154,9 @@ class ScoreScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Seu Score',
-                style: AppTextStyles.h1.copyWith(color: AppColors.textDark, fontSize: 24)),
+            Text('Score de $name', style: AppTextStyles.h1.copyWith(color: AppColors.textDark, fontSize: 24)),
             const SizedBox(height: 24),
-            _buildScoreGauge(600),
+            _buildScoreGauge(userScore),
             const SizedBox(height: 24),
             Text('Impactos',
                 style: AppTextStyles.h2.copyWith(color: AppColors.textDark, fontSize: 18)),
@@ -176,14 +175,14 @@ class ScoreScreen extends StatelessWidget {
       ),
     );
   }
-
+  
   Widget _buildScoreGauge(double score) {
     String label;
     Color color;
-    if (score < 300) {
+    if (score < 30) {
       label = 'Baixo';
       color = Colors.red;
-    } else if (score < 700) {
+    } else if (score < 70) {
       label = 'Médio';
       color = Colors.orange;
     } else {
@@ -198,7 +197,7 @@ class ScoreScreen extends StatelessWidget {
           child: SfRadialGauge(axes: <RadialAxis>[
             RadialAxis(
               minimum: 0,
-              maximum: 1000,
+              maximum: 100,
               showLabels: false,
               showTicks: false,
               startAngle: 180,
@@ -218,19 +217,19 @@ class ScoreScreen extends StatelessWidget {
               ranges: <GaugeRange>[
                 GaugeRange(
                     startValue: 0,
-                    endValue: 300,
+                    endValue: 30,
                     color: Colors.red,
                     startWidth: 20,
                     endWidth: 20),
                 GaugeRange(
-                    startValue: 300,
-                    endValue: 700,
+                    startValue: 30,
+                    endValue: 70,
                     color: Colors.orange,
                     startWidth: 20,
                     endWidth: 20),
                 GaugeRange(
-                    startValue: 700,
-                    endValue: 1000,
+                    startValue: 70,
+                    endValue: 100,
                     color: Colors.green,
                     startWidth: 20,
                     endWidth: 20),
@@ -238,7 +237,7 @@ class ScoreScreen extends StatelessWidget {
             )
           ]),
         ),
-        Text('${score.toInt()} de 1000',
+        Text('${score.toInt()} de 100',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         Chip(
