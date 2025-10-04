@@ -1,3 +1,4 @@
+// lib/screens/Score_screen.dart
 import 'package:flutter/material.dart';
 import 'package:kip/core/layout/base_layout.dart';
 import 'package:kip/core/theme/app_colors.dart';
@@ -6,7 +7,9 @@ import 'package:kip/screens/chat_screen.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class ScoreScreen extends StatelessWidget {
-  const ScoreScreen({super.key});
+  final bool isNewUser;
+
+  const ScoreScreen({super.key, this.isNewUser = false});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +17,9 @@ class ScoreScreen extends StatelessWidget {
       body: BaseLayout(
         builder: (context, values) {
           final isDesktop = values.isDesktop;
-          final scoreCard = _buildScoreCard(context); // Passando o context
+          final scoreCard = isNewUser
+              ? _buildNewUserScoreCard(context)
+              : _buildScoreCard(context);
           final actionButtons = _buildActionButtons(context);
 
           if (isDesktop) {
@@ -55,7 +60,6 @@ class ScoreScreen extends StatelessWidget {
     );
   }
 
-  // Agrupa os botões de ação
   Widget _buildActionButtons(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -77,7 +81,6 @@ class ScoreScreen extends StatelessWidget {
     );
   }
 
-  // Widget para os botões de ação
   Widget _buildActionButton(
       {required String label, required VoidCallback onTap, bool hasIcon = false}) {
     return InkWell(
@@ -103,7 +106,39 @@ class ScoreScreen extends StatelessWidget {
     );
   }
 
-  // Cartão com a pontuação e os impactos (com scroll interno)
+  Widget _buildNewUserScoreCard(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.hourglass_empty, size: 48, color: AppColors.textDark),
+            const SizedBox(height: 16),
+            Text(
+              'Score Indisponível',
+              style: AppTextStyles.h1.copyWith(color: AppColors.textDark, fontSize: 24),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Seu score será calculado em breve. Continue usando nossos serviços para melhorá-lo!',
+              style: AppTextStyles.h4,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildScoreCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(32),
@@ -111,22 +146,18 @@ class ScoreScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
       ),
-      // 1. Adicionamos uma restrição de altura máxima
       constraints: BoxConstraints(
-        // O card poderá ocupar no máximo 70% da altura da tela
         maxHeight: MediaQuery.of(context).size.height * 0.7,
       ),
-      // 2. Adicionamos a rolagem interna
       child: SingleChildScrollView(
         child: Column(
-          // mainAxisSize.min garante que a coluna não tente se esticar desnecessariamente
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Seu Score',
                 style: AppTextStyles.h1.copyWith(color: AppColors.textDark, fontSize: 24)),
             const SizedBox(height: 24),
-            _buildScoreGauge(600), // Pontuação de exemplo
+            _buildScoreGauge(600),
             const SizedBox(height: 24),
             Text('Impactos',
                 style: AppTextStyles.h2.copyWith(color: AppColors.textDark, fontSize: 18)),
@@ -146,7 +177,6 @@ class ScoreScreen extends StatelessWidget {
     );
   }
 
-  // Medidor de pontuação
   Widget _buildScoreGauge(double score) {
     String label;
     Color color;
@@ -220,10 +250,8 @@ class ScoreScreen extends StatelessWidget {
     );
   }
 
-  // Itens de impacto (pontos positivos e a melhorar) - AGORA RECOLHÍVEIS
   Widget _buildImpactItem(String title, Color bgColor, IconData icon,
       Color iconColor, List<String> items) {
-    // Se a lista de itens estiver vazia, retorna um card simples (não expansível)
     if (items.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(16),
@@ -246,7 +274,6 @@ class ScoreScreen extends StatelessWidget {
       );
     }
 
-    // Se houver itens, retorna um card expansível (ExpansionTile)
     return Card(
       elevation: 0,
       margin: EdgeInsets.zero,
