@@ -39,7 +39,7 @@ Um agente de IA que combina negociação, retenção e inteligência de relacion
 ## Arquitetura do KIP
 
 - **Frontend**: Chat interativo construído com Flutter para negociação com o cliente.
-- **Backend**: Dart e Gemini API processam os dados do usuário e geram propostas personalizadas.
+- **Backend**: Dart e Gemini API processam os dados do usuário e geram propostas personalizadas. **Acesse o repositório aqui:** https://github.com/leticia-farias/backend_assistente
 - **Banco de Dados**: PostgreSQL para armazenar perfis de clientes, histórico de interações e o score dinâmico.
 
 ## Estrutura do Projeto
