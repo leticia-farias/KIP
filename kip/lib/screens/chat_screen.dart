@@ -25,16 +25,13 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    // Mensagem inicial de boas-vindas da IA
     _messages.add(ChatMessage(
         text:
-            'Olá! Sou seu assistente de planos. Diga-me o que você precisa (ex: "Quero dados móveis até 100 reais").',
+            'Olá, sou seu assistente inteligente. Me conte o que você precisa e quanto pode pagar.',
         isUser: false));
 
-    // Se houver uma mensagem inicial da tela de onboarding, processa ela
     if (widget.initialMessage != null && widget.initialMessage!.isNotEmpty) {
       _controller.text = widget.initialMessage!;
-      // Usamos um pequeno atraso para garantir que a UI construiu antes de enviar
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _sendMessage();
       });
@@ -86,7 +83,6 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 1. Usando o BaseLayout como corpo principal
       body: BaseLayout(
         builder: (context, values) {
           return Column(
@@ -100,7 +96,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               const SizedBox(height: 16), // Espaçamento antes do input
-              // 2. Usando o CustomInput no lugar do _buildInputArea
               CustomInput(
                 controller: _controller,
                 isLoading: _isLoading,

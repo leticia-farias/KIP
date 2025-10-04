@@ -11,6 +11,7 @@ class AppColors {
   // Cores de Texto
   static const Color textLight = Colors.white;
   static const Color textDark = Colors.black;
+  static const Color hintText = Color(0xFF868E98);
 
   // Cores dos Botões
   static const Color buttonPrimary = Color(0xFF44BC7C); // Verde do botão "Aceitar"

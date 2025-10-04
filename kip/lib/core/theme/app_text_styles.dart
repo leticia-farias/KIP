@@ -20,11 +20,16 @@ class AppTextStyles {
     color: AppColors.textDark,
   );
   
-  // normal: fontSize 14, normal, AppColors.textLight
   static final TextStyle normal = GoogleFonts.poppins(
     fontSize: 14,
     fontWeight: FontWeight.normal,
     color: AppColors.textLight,
+  );
+
+  static final TextStyle hintText = GoogleFonts.poppins(
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    color: AppColors.hintText,
   );
 
   // caption: fontSize 12, normal, AppColors.grey (usando lightGrey)
@@ -32,11 +37,5 @@ class AppTextStyles {
     fontSize: 12,
     fontWeight: FontWeight.normal,
     color: AppColors.lightGrey,
-  );
-  
-  // Estilo antigo 'p' pode ser mantido ou substituído pelo 'normal'
-  static final TextStyle p = GoogleFonts.poppins(
-    fontSize: 16,
-    color: AppColors.textLight,
   );
 }

@@ -10,13 +10,12 @@ class SmartAssistantApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Assistente Inteligente',
+      title: 'Assistente Inteligente - Claro',
       theme: ThemeData(
         primarySwatch: Colors.red,
         scaffoldBackgroundColor: const Color(0xFFC50000), // Fundo vermelho padrão
-        fontFamily: 'Roboto', // Exemplo de fonte, pode ser customizada
       ),
-      home: const OnboardingScreen(),
+      home: const ChatScreen(),
     );
   }
 }

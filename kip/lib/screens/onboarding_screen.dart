@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kip/core/layout/base_layout.dart';
 import 'package:kip/core/theme/app_colors.dart';
 import 'package:kip/core/theme/app_text_styles.dart';
-import 'package:kip/screens/chat_screen.dart'; // 1. Importar a ChatScreen
+import 'package:kip/screens/chat_screen.dart'; 
 import 'package:kip/widgets/custom_input.dart';
 
 class OnboardingScreen extends StatefulWidget {
