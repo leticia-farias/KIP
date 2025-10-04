@@ -17,15 +17,10 @@ class LoginScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Que bom te ver por aqui!',
-                style: AppTextStyles.h1.copyWith(color: Colors.white),
+                'Login',
+                style: AppTextStyles.h2.copyWith(color: Colors.white),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Acesse sua conta para continuar.',
-                style: AppTextStyles.h4,
-              ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
               // --- Formulário de Login ---
               _buildTextField(label: 'E-mail', keyboardType: TextInputType.emailAddress),

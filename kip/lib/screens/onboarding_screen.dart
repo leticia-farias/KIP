@@ -1,46 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:kip/core/layout/base_layout.dart';
-import 'package:kip/models/chat_message.dart';
-import 'package:kip/services/assistant_service.dart';
+import 'package:kip/core/theme/app_colors.dart';
+import 'package:kip/core/theme/app_text_styles.dart';
+import 'package:kip/screens/chat_screen.dart';
+import 'package:kip/screens/login_screen.dart'; // Import da tela de login
 import 'package:kip/widgets/custom_input.dart';
-import 'package:kip/widgets/message_bubble.dart';
 
-class ChatScreen extends StatefulWidget {
-  // 1. O parâmetro é definido aqui
-  final String? initialMessage;
-  final VoidCallback? onChatComplete;
-
-  // 2. O construtor é atualizado para aceitar o parâmetro
-  const ChatScreen({
-    super.key,
-    this.initialMessage,
-    this.onChatComplete,
-  });
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
-  final List<ChatMessage> _messages = [];
+class _OnboardingScreenState extends State<OnboardingScreen> {
   final TextEditingController _controller = TextEditingController();
-  bool _isLoading = false;
-
-  final AssistantService _service =
-      AssistantService(apiUrl: 'https://backend-assistente-a5hj.onrender.com/');
-
-  @override
-  void initState() {
-    super.initState();
-
-    // 3. A lógica para usar a mensagem inicial é executada aqui
-    if (widget.initialMessage != null && widget.initialMessage!.isNotEmpty) {
-      _controller.text = widget.initialMessage!;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _sendMessage();
-      });
-    }
-  }
 
   @override
   void dispose() {
@@ -48,72 +22,65 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
-  void _sendMessage() async {
+  /// Navega para a tela de chat com a mensagem inicial do usuário.
+  void _handleSubmitted() {
     final text = _controller.text.trim();
-    if (text.isEmpty || _isLoading) return;
+    if (text.isEmpty) return;
 
-    setState(() {
-      _messages.add(ChatMessage(text: text, isUser: true));
-      _controller.clear();
-      _isLoading = true;
-    });
-
-    try {
-      final suggestions = await _service.getSuggestions(text);
-      if (mounted) {
-        setState(() {
-          _messages.add(ChatMessage(
-              text: suggestions.isEmpty
-                  ? 'Não encontrei sugestões para sua solicitação.'
-                  : 'Com base no que você pediu, encontrei as seguintes opções:',
-              isUser: false,
-              suggestions: suggestions));
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _messages.add(ChatMessage(
-              text: 'Desculpe, tive um problema para me conectar. Tente novamente mais tarde.',
-              isUser: false));
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+    if (mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ChatScreen(initialMessage: text),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: BaseLayout(
         builder: (context, values) {
           return Column(
             children: [
               Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  itemCount: _messages.length,
-                  itemBuilder: (context, index) => MessageBubble(message: _messages[index]),
-                ),
-              ),
-              if (widget.onChatComplete != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
-                    onPressed: widget.onChatComplete,
-                    child: const Text("Continuar para o Cadastro"),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // Centraliza o conteúdo
+                    children: [
+                      Text(
+                        'Olá, sou seu assistente inteligente. Me conte o que você precisa e quanto pode pagar.',
+                        style: AppTextStyles.h2
+                            .copyWith(color: AppColors.textLight),
+                      ),
+                      const SizedBox(height: 32),
+                      CustomInput(
+                        controller: _controller,
+                        isLoading: false,
+                        onSend: _handleSubmitted,
+                      ),
+                    ],
                   ),
                 ),
+              ),
+              // Botão para navegar para a tela de login
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CustomInput(
-                  controller: _controller,
-                  isLoading: _isLoading,
-                  onSend: _sendMessage,
+                padding: const EdgeInsets.only(bottom: 32.0),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    );
+                  },
+                  child: Text(
+                    'Já tem uma conta? Faça login',
+                    style: AppTextStyles.h4.copyWith(
+                      color: AppColors.textLight,
+                      decoration: TextDecoration.underline,
+                      decorationColor: AppColors.textLight,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -123,3 +90,4 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
+

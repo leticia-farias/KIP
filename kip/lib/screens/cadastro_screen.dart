@@ -38,6 +38,7 @@ class CadastroScreen extends StatelessWidget {
               ConfirmButton(
                 text: 'Continuar',
                 onPressed: () {
+                  // Navega para a tela de confirmação, levando os dados do pacote
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => ConfirmarScreen(package: package),
