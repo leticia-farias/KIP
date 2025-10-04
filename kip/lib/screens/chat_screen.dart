@@ -25,14 +25,12 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-
-    // Se uma mensagem inicial for passada, envia ela imediatamente.
     if (widget.initialMessage != null && widget.initialMessage!.isNotEmpty) {
       _controller.text = widget.initialMessage!;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _sendMessage();
       });
-    } 
+    }
   }
 
   @override
@@ -46,7 +44,7 @@ class _ChatScreenState extends State<ChatScreen> {
     if (text.isEmpty || _isLoading) return;
 
     setState(() {
-      _messages.insert(0, ChatMessage(text: text, isUser: true));
+      _messages.add(ChatMessage(text: text, isUser: true));
       _controller.clear();
       _isLoading = true;
     });
@@ -55,25 +53,42 @@ class _ChatScreenState extends State<ChatScreen> {
       final suggestions = await _service.getSuggestions(text);
       if (mounted) {
         setState(() {
-          _messages.insert(
-              0,
+          if (suggestions.isEmpty) {
+            _messages.add(
               ChatMessage(
-                  text: suggestions.isEmpty
-                      ? 'Não encontrei sugestões para sua solicitação.'
-                      : 'Com base no que você pediu, encontrei as seguintes opções:',
+                text: 'Não encontrei sugestões para sua solicitação.',
+                isUser: false,
+              ),
+            );
+          } else {
+            _messages.add(
+              ChatMessage(
+                text: 'Com base no que você pediu, encontrei as seguintes opções:',
+                isUser: false,
+              ),
+            );
+
+            for (var suggestion in suggestions) {
+              _messages.add(
+                ChatMessage(
+                  text: '',
                   isUser: false,
-                  suggestions: suggestions));
+                  suggestions: [suggestion],
+                ),
+              );
+            }
+          }
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _messages.insert(
-              0,
-              ChatMessage(
-                  text:
-                      'Desculpe, tive um problema para me conectar. Tente novamente mais tarde.',
-                  isUser: false));
+          _messages.add(
+            ChatMessage(
+              text: 'Desculpe, tive um problema para me conectar. Tente novamente mais tarde.',
+              isUser: false,
+            ),
+          );
         });
       }
     } finally {
@@ -92,10 +107,12 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               Expanded(
                 child: ListView.builder(
+                  reverse: true,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
-                    return MessageBubble(message: _messages[index]);
+                    final message = _messages[_messages.length - 1 - index];
+                    return MessageBubble(message: message);
                   },
                 ),
               ),
@@ -114,4 +131,3 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-
